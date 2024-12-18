@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nurse Rostering App</title>
+</head>
+<body>
+    <h1>Nurse Rostering Input</h1>
+    <form action="/generate_schedule" method="POST">
+        <label>Number of Midwives: <input type="number" name="num_midwives" value="20" required></label><br>
+        <label>Number of Days: <input type="number" name="num_days" value="30" required></label><br>
+        <label>Min Midwives per Shift: <input type="number" name="min_midwives" value="3" required></label><br>
+        <input type="submit" value="Generate Roster">
+    </form>
+</body>
+</html>

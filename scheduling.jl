@@ -165,6 +165,7 @@ model = Model(SCIP.Optimizer)
 
 optimize!(model)
 
+
 # -------------------------
 # Results
 # -------------------------
@@ -182,39 +183,39 @@ end
 #out put to have it as a heat map
 
 
-# # Define the shift codes
-# shift_codes = Dict("AM" => 1, "PM" => 2, "Night" => 3, "None" => 0)
+# Define the shift codes
+shift_codes = Dict("AM" => 1, "PM" => 2, "Night" => 3, "None" => 0)
 
-# # Create a matrix to store the assignments
-# assignment_matrix = fill(0, num_midwives, num_days)
+# Create a matrix to store the assignments
+assignment_matrix = fill(0, num_midwives, num_days)
 
-# # Populate the matrix with the results from the optimization
-# for i in 1:num_midwives
-#     for d in 1:num_days
-#         shift_assigned = "None"
-#         for s in shifts
-#             if value(X[i, d, s]) > 0.5
-#                 shift_assigned = s
-#                 break
-#             end
-#         end
-#         assignment_matrix[i, d] = shift_codes[shift_assigned]
-#     end
-# end
+# Populate the matrix with the results from the optimization
+for i in 1:num_midwives
+    for d in 1:num_days
+        shift_assigned = "None"
+        for s in shifts
+            if value(X[i, d, s]) > 0.5
+                shift_assigned = s
+                break
+            end
+        end
+        assignment_matrix[i, d] = shift_codes[shift_assigned]
+    end
+end
 
 
-# # Plot the heatmap
-# heatmap(
-#     assignment_matrix,
-#     xlabel="Days",
-#     ylabel="Midwives",
-#     title="Midwife Shift Assignments",
-#     xticks=1:num_days,
-#     yticks=1:num_midwives,
-#     colorbar_title="Shift",
-#     color=:viridis,
-#     clim=(0, 3)
-# )
+# Plot the heatmap
+heatmap(
+    assignment_matrix,
+    xlabel="Days",
+    ylabel="Midwives",
+    title="Midwife Shift Assignments",
+    xticks=1:num_days,
+    yticks=1:num_midwives,
+    colorbar_title="Shift",
+    color=:viridis,
+    clim=(0, 3)
+)
 
-# # Add a custom color legend
-# annotate!(num_days + 1, num_midwives // 2, text("0: None\n1: AM\n2: PM\n3: Night", 10, :left))
+# Add a custom color legend
+annotate!(num_days + 1, num_midwives // 2, text("0: None\n1: AM\n2: PM\n3: Night", 10, :left))

@@ -18,11 +18,11 @@ async function sendRequest() {
     // Send POST request to the server
     try {
         const response = await fetch('http://127.0.0.1:8080/api/solve', {
-            method: 'POST',
+            method: 'POST', // Change to POST for sending the data
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data), // Send the JSON-encoded data
         });
 
         if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
@@ -34,20 +34,3 @@ async function sendRequest() {
         document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
     }
 }
-
-// function displayResults(schedule) {
-//     const resultsDiv = document.getElementById('results');
-//     resultsDiv.innerHTML = ''; // Clear previous results
-    
-//     for (const [day, shifts] of Object.entries(schedule)) {
-//         const dayDiv = document.createElement('div');
-//         dayDiv.className = 'day';
-//         dayDiv.innerHTML = `<strong>Day ${day}</strong><br>`;
-        
-//         for (const [shift, midwives] of Object.entries(shifts)) {
-//             dayDiv.innerHTML += `${shift}: ${midwives.join(', ')}<br>`;
-//         }
-        
-//         resultsDiv.appendChild(dayDiv);
-//     }
-// }

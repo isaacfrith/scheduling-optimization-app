@@ -50,7 +50,7 @@ fte = Dict(
 
 
 # Hours per shift
-A dictionary that defines the number of hours per shift for the different shift types (AM, PM, Night).
+#A dictionary that defines the number of hours per shift for the different shift types (AM, PM, Night).
 shift_hours = Dict("AM" => 8.5, "PM" => 8.5, "Night" => 8.5)
 
 # Minimum midwives and supervisors per shift

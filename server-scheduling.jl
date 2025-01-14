@@ -151,10 +151,15 @@ end
 function serve_solve(request::HTTP.Request)
     data = JSON.parse(String(request.body))
     solution = endpoint_solve(data)
+    @info HTTP.Response(200, Dict(
+        "Access-Control-Allow-Origin" => "*",
+        "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
+        "Access-Control-Allow-Headers" => "*"
+    ), JSON.json(solution))
     return HTTP.Response(200, Dict(
         "Access-Control-Allow-Origin" => "*",
         "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
-        "Access-Control-Allow-Headers" => "Content-Type"
+        "Access-Control-Allow-Headers" => "*"
     ), JSON.json(solution))
 end
 
@@ -163,26 +168,30 @@ end
 
 function setup_server(host, port)
     server = HTTP.Sockets.listen(host, port)
+    @info server
     HTTP.serve!(host, port; server = server) do request
         try
             if request.method == "OPTIONS"
                 return HTTP.Response(200, Dict(
                     "Access-Control-Allow-Origin" => "*",
                     "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
-                    "Access-Control-Allow-Headers" => "Content-Type"
+                    "Access-Control-Allow-Headers" => "*"
                 ), "")
             end
             if request.target == "/api/solve"
                 return serve_solve(request)
             else
-                return HTTP.Response(404, Dict("Access-Control-Allow-Origin" => "*"), "Not Found")
+                return HTTP.Response(404, Dict("Access-Control-Allow-Origin" => "*",
+                "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers" => "*"), "Not Found")
             end
         catch err
             return HTTP.Response(500, Dict(
                 "Access-Control-Allow-Origin" => "*",
                 "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
-                "Access-Control-Allow-Headers" => "Content-Type"
+                "Access-Control-Allow-Headers" => "*"
             ), "Internal Server Error")
         end
+        return Response
     end
 end

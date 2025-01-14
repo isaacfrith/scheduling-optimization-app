@@ -4,11 +4,18 @@ import JSON
 
 function send_request(data::Dict; endpoint::String = "solve")
     ret = HTTP.request(
+
         "POST",
         # This should match the URL and endpoint we defined for our server.
         "http://127.0.0.1:8080/api/$endpoint",
-        ["Content-Type" => "application/json"],
+        [
+            "Content-Type" => "application/json",
+            "Origin" => "http://127.0.0.1:8080",  # Add the Origin header
+            "Access-Control-Request-Method" => "POST",
+            "Access-Control-Allow-Origin" => "*"
+        ],
         JSON.json(data),
+        
     )
     if ret.status != 200
         # This could happen if there are time-outs, network errors, etc.

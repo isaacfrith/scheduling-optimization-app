@@ -151,8 +151,13 @@ end
 function serve_solve(request::HTTP.Request)
     data = JSON.parse(String(request.body))
     solution = endpoint_solve(data)
-    return HTTP.Response(200, JSON.json(solution))
+    return HTTP.Response(200, Dict(
+        "Access-Control-Allow-Origin" => "*",
+        "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
+        "Access-Control-Allow-Headers" => "Content-Type"
+    ), JSON.json(solution))
 end
+
 
 
 
@@ -160,35 +165,24 @@ function setup_server(host, port)
     server = HTTP.Sockets.listen(host, port)
     HTTP.serve!(host, port; server = server) do request
         try
-            # Handle CORS preflight requests
             if request.method == "OPTIONS"
-                return HTTP.Response(200, "", Dict(
+                return HTTP.Response(200, Dict(
                     "Access-Control-Allow-Origin" => "*",
                     "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
                     "Access-Control-Allow-Headers" => "Content-Type"
-                ))
+                ), "")
             end
-
-            # Handle the /api/solve endpoint
             if request.target == "/api/solve"
-                response = serve_solve(request)
-                HTTP.setheader!(response.headers, "Access-Control-Allow-Origin", "*")
-                return response
+                return serve_solve(request)
             else
-                # Handle unknown endpoints with CORS headers
-                return HTTP.Response(404, "target $(request.target) not found", Dict(
-                    "Access-Control-Allow-Origin" => "*"
-                ))
+                return HTTP.Response(404, Dict("Access-Control-Allow-Origin" => "*"), "Not Found")
             end
         catch err
-            # Handle errors with CORS headers
-            @info "Unhandled exception: $err"
-            return HTTP.Response(500, "internal error", Dict(
+            return HTTP.Response(500, Dict(
                 "Access-Control-Allow-Origin" => "*",
                 "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
                 "Access-Control-Allow-Headers" => "Content-Type"
-            ))
+            ), "Internal Server Error")
         end
     end
-    return server
 end

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +17,15 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+        }
+        #heatmap {
+            max-width: 100%;
+            height: auto;
+        }
+        #heatmap-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -44,8 +51,12 @@
     </form>
     
     <div id="results"></div>
-    <canvas id="heatmap" width="900" height="600"></canvas>
-
+    <div id="heatmap-container">
+        <canvas id="heatmap"></canvas>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.0"></script>
     <script src="app.js"></script>
 </body>
 </html>

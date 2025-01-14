@@ -28,13 +28,12 @@ async function sendRequest() {
         if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
         
         const schedule = await response.json();
-        displayResults(schedule);
+        window.displayResults(schedule);
     } catch (error) {
         console.error('Error:', error);
         document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
     }
 }
-
 
 function displayResults(schedule) {
     const numNurses = 30; // Total number of nurses
@@ -78,11 +77,19 @@ function displayResults(schedule) {
                 },
                 borderWidth: 1,
                 borderColor: 'rgba(0,0,0,0.1)',
-                width: ({ chart }) => (chart.chartArea.width / numDays),
-                height: ({ chart }) => (chart.chartArea.height / numNurses)
+                width: ({ chart }) => {
+                    // Ensure chartArea is defined
+                    return chart.chartArea ? chart.chartArea.width / numDays : 10;
+                },
+                height: ({ chart }) => {
+                    // Ensure chartArea is defined
+                    return chart.chartArea ? chart.chartArea.height / numNurses : 10;
+                }
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: true,
             scales: {
                 x: {
                     type: 'linear',
@@ -91,15 +98,20 @@ function displayResults(schedule) {
                 },
                 y: {
                     type: 'linear',
+                    offset: true, // Adds separation between rows
                     title: { display: true, text: 'Nurse ID' },
-                    ticks: { stepSize: 1 }
+                    ticks: {
+                        stepSize: 1, // Ensure each Nurse ID is displayed
+                        padding: 10, // Add padding between labels and axis
+                        font: {
+                            size: 12 // Adjust font size for better readability
+                        }
+                    }
                 }
             },
             plugins: {
                 legend: { display: false }
-            },
-            responsive: true,
-            maintainAspectRatio: false
+            }
         }
-    });
+    }); // Corrected closing bracket here
 }

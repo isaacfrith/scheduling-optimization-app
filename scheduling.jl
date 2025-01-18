@@ -26,7 +26,7 @@
 
 """
 
-using JuMP, Plots
+using JuMP
 using SCIP, HiGHS
 
 # -------------------------
@@ -34,7 +34,7 @@ using SCIP, HiGHS
 # -------------------------
 
 # Number of midwives
-num_midwives = 30
+num_midwives = 25
 
 # Number of days in the period
 num_days = 30
@@ -56,7 +56,7 @@ shift_hours = Dict("AM" => 8.5, "PM" => 8.5, "Night" => 8.5)
 # Minimum midwives and supervisors per shift
 min_midwives_per_shift = 3
 min_supervisors_per_shift = 1
-supervisors = [1, 5, 10, 15, 16, 19, 20, 25, 30]  # Example supervisor indices
+supervisors = [1, 5, 10, 15, 16, 19, 20, 25]  # Example supervisor indices
 
 # Preference scores (example: random preferences for demonstration)
 preferences = Dict((i, d, s) => rand(1:10) for i in 1:num_midwives, d in 1:num_days, s in shifts)
@@ -176,39 +176,39 @@ end
 #out put to have it as a heat map
 
 
-# Define the shift codes
-shift_codes = Dict("AM" => 1, "PM" => 2, "Night" => 3, "None" => 0)
+# # Define the shift codes
+# shift_codes = Dict("AM" => 1, "PM" => 2, "Night" => 3, "None" => 0)
 
-# Create a matrix to store the assignments
-assignment_matrix = fill(0, num_midwives, num_days)
+# # Create a matrix to store the assignments
+# assignment_matrix = fill(0, num_midwives, num_days)
 
-# Populate the matrix with the results from the optimization
-for i in 1:num_midwives
-    for d in 1:num_days
-        shift_assigned = "None"
-        for s in shifts
-            if value(X[i, d, s]) > 0.5
-                shift_assigned = s
-                break
-            end
-        end
-        assignment_matrix[i, d] = shift_codes[shift_assigned]
-    end
-end
+# # Populate the matrix with the results from the optimization
+# for i in 1:num_midwives
+#     for d in 1:num_days
+#         shift_assigned = "None"
+#         for s in shifts
+#             if value(X[i, d, s]) > 0.5
+#                 shift_assigned = s
+#                 break
+#             end
+#         end
+#         assignment_matrix[i, d] = shift_codes[shift_assigned]
+#     end
+# end
 
 
-# Plot the heatmap
-heatmap(
-    assignment_matrix,
-    xlabel="Days",
-    ylabel="Midwives",
-    title="Midwife Shift Assignments",
-    xticks=1:num_days,
-    yticks=1:num_midwives,
-    colorbar_title="Shift",
-    color=:viridis,
-    clim=(0, 3)
-)
+# # Plot the heatmap
+# heatmap(
+#     assignment_matrix,
+#     xlabel="Days",
+#     ylabel="Midwives",
+#     title="Midwife Shift Assignments",
+#     xticks=1:num_days,
+#     yticks=1:num_midwives,
+#     colorbar_title="Shift",
+#     color=:viridis,
+#     clim=(0, 3)
+# )
 
-# Add a custom color legend
-annotate!(num_days + 1, num_midwives // 2, text("0: None\n1: AM\n2: PM\n3: Night", 10, :left))
+# # Add a custom color legend
+# annotate!(num_days + 1, num_midwives // 2, text("0: None\n1: AM\n2: PM\n3: Night", 10, :left))

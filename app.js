@@ -1,3 +1,5 @@
+let chartInstance; // Global variable to store the chart instance
+
 async function sendRequest() {
     // Collect input values
     const numMidwives = document.getElementById('num_midwives').value;
@@ -18,57 +20,54 @@ async function sendRequest() {
     // Send POST request to the server
     try {
         const response = await fetch('http://127.0.0.1:8080/api/solve', {
-            method: 'POST', // Change to POST for sending the data
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data), // Send the JSON-encoded data
+            body: JSON.stringify(data),
         });
 
+       
         if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
-        
-        const schedule = await response.json();
-        window.displayResults(schedule);
+
+        const result = await response.json();
+
+        // Check if the response contains an error
+        if (result.error) {
+            document.getElementById('results').innerHTML = `<p style="color: red;">Problem is not solvable: ${result.error}</p>`;
+        } else {
+            // Display results if no error
+            displayResults(result, parseInt(numMidwives), parseInt(numDays));
+        }
+
     } catch (error) {
         console.error('Error:', error);
         document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
     }
 }
 
-function displayResults(schedule) {
-    const numNurses = 30; // Total number of nurses
-    const numDays = 30; // Total number of days
 
-    // Create a 2D array with default value 0 (no shift)
-    const heatmapData = Array.from({ length: numNurses }, () => Array(numDays).fill(0));
 
-    // Populate the heatmapData based on the schedule
-    for (const nurseId in schedule) {
-        const shifts = schedule[nurseId];
-        const nurseIndex = parseInt(nurseId) - 1; // Convert nurse ID to array index
+function displayResults(schedule, numMidwives, numDays) {
+    // I want to create a heatmap that can be used by the chartInstance below
+    
 
-        for (const shiftType in shifts) {
-            const days = shifts[shiftType];
-            days.forEach(day => {
-                const dayIndex = day - 1; // Convert day to array index
-                if (shiftType === 'Night') heatmapData[nurseIndex][dayIndex] = 3;
-                if (shiftType === 'PM') heatmapData[nurseIndex][dayIndex] = 2;
-                if (shiftType === 'AM') heatmapData[nurseIndex][dayIndex] = 1;
-            });
-        }
-    }
+
+
+
 
     // Render the heatmap using Chart.js
     const ctx = document.getElementById('heatmap').getContext('2d');
-    new Chart(ctx, {
+
+    chartInstance = new Chart(ctx, {
         type: 'matrix',
         data: {
             datasets: [{
                 label: 'Midwife Shifts',
                 data: heatmapData.flatMap((row, nurseIndex) =>
                     row.map((value, dayIndex) => ({ x: dayIndex + 1, y: nurseIndex + 1, v: value }))
-                ),
-                backgroundColor: function(context) {
+                ),               
+                backgroundColor: function (context) {
                     const value = context.raw.v;
                     if (value === 3) return 'rgba(255, 0, 0, 0.7)'; // Night: red
                     if (value === 2) return 'rgba(0, 0, 255, 0.7)'; // PM: blue
@@ -77,14 +76,9 @@ function displayResults(schedule) {
                 },
                 borderWidth: 1,
                 borderColor: 'rgba(0,0,0,0.1)',
-                width: ({ chart }) => {
-                    // Ensure chartArea is defined
-                    return chart.chartArea ? chart.chartArea.width / numDays : 10;
-                },
-                height: ({ chart }) => {
-                    // Ensure chartArea is defined
-                    return chart.chartArea ? chart.chartArea.height / numNurses : 10;
-                }
+                width: ({ chart }) => chart.chartArea ? chart.chartArea.width / Math.max(numDays, 1) : 10,
+                height: ({ chart }) => chart.chartArea ? chart.chartArea.height / Math.max(numMidwives, 1) : 10,
+
             }]
         },
         options: {
@@ -95,23 +89,35 @@ function displayResults(schedule) {
                     type: 'linear',
                     title: { display: true, text: 'Day of Month' },
                     ticks: { stepSize: 1 }
+                    
                 },
                 y: {
                     type: 'linear',
                     offset: true, // Adds separation between rows
-                    title: { display: true, text: 'Nurse ID' },
+                    title: { display: true, text: 'Midwife ID' },
                     ticks: {
-                        stepSize: 1, // Ensure each Nurse ID is displayed
-                        padding: 10, // Add padding between labels and axis
-                        font: {
-                            size: 12 // Adjust font size for better readability
-                        }
+                        stepSize: 1,
+                        padding: 10,
+                        font: { size: 12 }
                     }
                 }
             },
             plugins: {
-                legend: { display: false }
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        generateLabels: () => [
+                            { text: 'Night Shift', fillStyle: 'rgba(255, 0, 0, 0.7)' },
+                            { text: 'PM Shift', fillStyle: 'rgba(0, 0, 255, 0.7)' },
+                            { text: 'AM Shift', fillStyle: 'rgba(0, 255, 0, 0.7)' },
+                            { text: 'No Shift', fillStyle: 'rgba(220, 220, 220, 0.3)' }
+                        ]
+                    }
+                }
             }
         }
-    }); // Corrected closing bracket here
+    });
+    
+
 }

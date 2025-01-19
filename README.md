@@ -1,6 +1,8 @@
 # Scheduling Optimization App
 
 An application to optimize scheduling for healthcare using advanced mathematical modeling and intuitive user interfaces.
+![image](https://github.com/user-attachments/assets/7f8c9869-ad70-4a2a-8006-3149f53d3efd)
+
 
 ## Features
 

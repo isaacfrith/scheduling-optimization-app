@@ -8,34 +8,43 @@
 </head>
 <body>
     <h1>Midwife Schedule</h1>
-    <div class="inline-container">
-    <form id="scheduleForm">
-        <label for="num_midwives">Number of Midwives:</label>
-        <input type="number" id="num_midwives" value="30" required><br><br>
-        
-        <label for="num_days">Number of Days:</label>
-        <input type="number" id="num_days" value="30" required><br><br>
-        
-        <label for="min_midwives_per_shift">Min Midwives per Shift:</label>
-        <input type="number" id="min_midwives_per_shift" value="3" required><br><br>
-        
-        <label for="min_supervisors_per_shift">Min Supervisors per Shift:</label>
-        <input type="number" id="min_supervisors_per_shift" value="1" required><br><br>
-        
-        <label for="supervisors">Supervisors (comma-separated IDs):</label>
-        <input type="text" id="supervisors" value="1,5,10,15,16,19,20,25,30" required><br><br>
-        
-        <button type="button" onclick="sendRequest()">Get Schedule</button>
-    </form>
-    
-    
-    <div id="chartContainer" style="position: relative; height: 400px; width: 800px;">
-        <canvas id="heatmap"></canvas>
+
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-container">
+            <form id="scheduleForm">
+                <div id="data">
+                <label for="num_midwives">Number of Midwives:</label>
+                <input type="number" id="num_midwives" value="30" required><br><br>
+                
+                <label for="num_days">Number of Days:</label>
+                <input type="number" id="num_days" value="30" required><br><br>
+                
+                <label for="min_midwives_per_shift">Min Midwives per Shift:</label>
+                <input type="number" id="min_midwives_per_shift" value="3" required><br><br>
+                
+                <label for="min_supervisors_per_shift">Min Supervisors per Shift:</label>
+                <input type="number" id="min_supervisors_per_shift" value="1" required><br><br>
+                
+                <label for="supervisors">Supervisors (comma-separated IDs):</label>
+                <input type="text" id="supervisors" value="1,5,10,15,16,19,20,25,30" required><br><br>
+
+                <button type="button" onclick="sendRequest()">Get Schedule</button>
+                </div>
+            </form>
+
+            
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-container" style="position: relative; width: 75%;">
+            <div id="heatmap"></div> <!-- AnyChart uses a div container -->
+        </div>
+
+        <!-- Results/Errors -->
+        <div id="results" style="margin-top: 20px; color: red;"></div>
     </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.0"></script>
+    <!-- Application Script -->
     <script src="app.js"></script>
 </body>
 </html>

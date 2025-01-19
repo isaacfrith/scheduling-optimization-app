@@ -49,7 +49,9 @@ function endpoint_solve(params::Dict{String,Any})
     @constraint(model, [d = 1:num_days, s in shifts], sum(X[i, d, s] for i in 1:num_midwives) == min_midwives_per_shift)
     @constraint(model, [i = 1:num_midwives, d = 1:num_days], X[i, d, "AM"] + X[i, d, "PM"] <= 1)
     @constraint(model, [i = 1:num_midwives, d = 1:num_days-1], X[i, d, "Night"] + X[i, d + 1, "AM"] <= 1)
+    @constraint(model, [i = 1:num_midwives, d = 1:num_days-1], X[i, d, "Night"] + X[i, d + 1, "PM"] <= 1)
     @constraint(model, [i = 1:num_midwives, d = 2:num_days], X[i, d, "AM"] + X[i, d - 1, "Night"] <= 1)
+    @constraint(model, [i = 1:num_midwives, d = 2:num_days], X[i, d, "PM"] + X[i, d - 1, "Night"] <= 1)
     @constraint(model, [i = 1:num_midwives, d = 1:num_days-6], sum(sum(X[i, d+k, s] for s in shifts) for k = 1:6) <= 5) 
     @constraint(model, [i = 1:num_midwives, d = 1:num_days-4], sum(X[i, d+k, "Night"] for k = 1:4) <= 4)
     @constraint(model, [i = 1:num_midwives, d = 1:num_days-7], sum(sum(shift_hours[s] * X[i, d+k, s] for s in shifts) for k = 1:7) <= 38 * fte[i])
@@ -65,8 +67,8 @@ function endpoint_solve(params::Dict{String,Any})
     end
 
    # Prepare results as a dictionary
-   ret = Dict{Int, Dict{String, Any}}()  # Dictionary with day as key, and another dictionary as value
-
+    ret = Dict{Int, Dict{String, Any}}()  # Dictionary with day as key, and another dictionary as value
+    fte_ret = fte
    for d in 1:num_days
        day_data = Dict{String, Any}()  # Dictionary for shifts on a specific day
        for s in shifts
@@ -78,7 +80,9 @@ function endpoint_solve(params::Dict{String,Any})
        ret[d] = day_data  # Store day data in main dictionary
    end
    
-   return ret
+#    return Dict("shifts" => ret, "fte" => fte)
+   return json_response = JSON.json(Dict("shifts" => ret, "fte" => fte))
+
 end
 
 
@@ -86,16 +90,12 @@ end
 function serve_solve(request::HTTP.Request)
     data = JSON.parse(String(request.body))
     solution = endpoint_solve(data)
-    @info HTTP.Response(200, Dict(
-        "Access-Control-Allow-Origin" => "*",
-        "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
-        "Access-Control-Allow-Headers" => "*"
-    ), JSON.json(solution))
+    @info solution
     return HTTP.Response(200, Dict(
         "Access-Control-Allow-Origin" => "*",
         "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
         "Access-Control-Allow-Headers" => "*"
-    ), JSON.json(solution))
+    ), solution)
 end
 
 

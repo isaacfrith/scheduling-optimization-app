@@ -14,7 +14,7 @@ function send_request(data::Dict; endpoint::String = "solve")
             "Access-Control-Request-Method" => "POST",
             "Access-Control-Allow-Origin" => "*"
         ],
-        JSON.json(data),
+        data,
         
     )
     if ret.status != 200
